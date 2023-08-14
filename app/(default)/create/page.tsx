@@ -74,6 +74,22 @@ export default function create() {
                             sx={{ marginTop: 1 }}
                         />
 
+                        <InputLabel id="" sx={{ marginTop: 3 }}>
+                                Enter shortlist
+                        </InputLabel>
+
+                        <TextField
+                            id="outlined-textarea"
+                            label="Shortlist"
+                            placeholder="Those who can claim"
+                            multiline
+                            fullWidth
+                            rows={2}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            sx={{ marginTop: 1 }}
+                        />
+
                         <div className="mt-8 w-full flex justify-center items-center">
                             <button
                                 onClick={mintCollection}

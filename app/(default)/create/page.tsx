@@ -112,7 +112,7 @@ export default function create() {
               placeholder="Those who can claim"
               multiline
               fullWidth
-              rows={2}
+              rows={8}
               value={shortlist}
               onChange={(e) => setShortlist(e.target.value)}
               sx={{ marginTop: 1 }}
@@ -124,7 +124,7 @@ export default function create() {
                 disabled={loading}
                 className="py-4 px-10 mx-auto text-white bg-blue-600 hover:bg-blue-700  rounded-md text-sm disabled:opacity-60"
               >
-                Mint Collection 🚀
+                Mint Collection 
               </button>
             </div>
           </div>

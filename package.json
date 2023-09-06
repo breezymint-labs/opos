@@ -18,6 +18,7 @@
     "@mui/material": "^5.14.4",
     "@solana/spl-account-compression": "^0.1.10",
     "@solana/spl-token": "^0.3.8",
+    "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/web3.js": "^1.78.4",
     "@types/node": "^20.2.5",
     "@types/react": "^18.2.7",

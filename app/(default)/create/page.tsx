@@ -6,9 +6,11 @@ import { MuiFileInput } from "mui-file-input";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Web3Storage } from "web3.storage";
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+const web3 = require("@solana/web3.js");
 
 // form uri -----------------------------------------------------------done
-// funds transfer to vault account 
+// funds transfer to vault account ------------------------------------done 
 // call create database
 // call fetch database
 // hardcode connection and payer
@@ -25,6 +27,9 @@ export default function create() {
         cover: "",
     });
 
+    const { publicKey, sendTransaction } = useWallet()
+    const connection = new web3.Connection(web3.clusterApiUrl('devnet'))
+
     const [loading, setLoading] = React.useState(false);
 
     async function changeImage (e: any) {
@@ -38,22 +43,28 @@ export default function create() {
     };
 
     async function mintCollection(e: any) {
-        
         e.preventDefault();
+        setLoading(true)
         const metadataUri = await createURI();
-        // --tx funds transfer to mint account
-        // 3PoUsfrtuzwrLP8AhvA7PEvEy9wJcbWGYKaj8k5uekXz
+        // let amount = await calculateCost()
+        let amount = 0.1
+        sendSol(amount)
 
         const data = {
             collectionName: formInput.name,
             collectionSymbol: formInput.symbol,
             metadataUri: metadataUri
         };
+
         try {
             const response = await axios.post("/api/create/", data);
+            setLoading(false)
             if (response.status === 201) {
-                // react toastify
-                console.log("collection minted")
+                // react toastify popup "Successful Collection Mint"
+                console.log("Successful Collection Mint")
+            }
+            else {
+                // react toastify popup "Minting Failed"
             }
         } catch (error: any) {
             console.error(error.response.data);
@@ -63,6 +74,22 @@ export default function create() {
     async function calculateCost() {
         // create collection cost
         // mint nft cost
+    }
+
+    function sendSol(amount: number) {
+        const transaction = new web3.Transaction()
+        // vault account public key
+        const recipientPubKey = `3PoUsfrtuzwrLP8AhvA7PEvEy9wJcbWGYKaj8k5uekXz`
+
+        const sendSolInstruction = web3.SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: recipientPubKey,
+            lamports: web3.LAMPORTS_PER_SOL * amount
+        })
+
+        transaction.add(sendSolInstruction)
+
+        sendTransaction(transaction, connection).then(sig => {console.log(sig)})
     }
 
     async function createURI() {

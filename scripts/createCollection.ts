@@ -44,6 +44,7 @@ export async function createCollection(
         0
     );
     console.log("Mint address:", mint.toBase58());
+    console.log(mint)
 
     // create the token account
     console.log("Creating a token account...");

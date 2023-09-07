@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Web3Storage } from "web3.storage";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-const web3 = require("@solana/web3.js");
+import * as web3 from "@solana/web3.js";
 
 // form uri -----------------------------------------------------------done
 // funds transfer to vault account ------------------------------------done
@@ -29,9 +29,11 @@ export default function create() {
     const { publicKey, sendTransaction } = useWallet();
     const connection = new web3.Connection(web3.clusterApiUrl("devnet"));
 
-    const [loading, setLoading] = React.useState(false);
+    const [imageLoading, setImageLoading] = React.useState(false);
+    const [mintLoading, setMintLoading] = React.useState(false);
 
     async function changeImage(e: any) {
+        setImageLoading(true);
         const inputFile = e.target.files[0];
         const inputFileName = e.target.files[0].name;
         const files = [new File([inputFile], inputFileName)];
@@ -39,15 +41,17 @@ export default function create() {
         const url = `https://ipfs.io/ipfs/${metaCID}/${inputFileName}`;
         console.log(url);
         setFormInput({ ...formInput, cover: url });
+        setImageLoading(false);
     }
 
     async function mintCollection(e: any) {
         e.preventDefault();
-        setLoading(true);
+        setMintLoading(true);
         const metadataUri = await createURI();
+        console.log(metadataUri);
         // let amount = await calculateCost()
         let amount = 0.001;
-        sendSol(amount);
+        // sendSol(amount);
 
         const data = {
             collectionName: formInput.name,
@@ -57,7 +61,7 @@ export default function create() {
 
         try {
             const response = await axios.post("/api/create/", data);
-            setLoading(false);
+            setMintLoading(false);
             if (response.status === 201) {
                 // react toastify popup "Successful Collection Mint"
                 console.log("Successful Collection Mint");
@@ -100,8 +104,7 @@ export default function create() {
         try {
             const metaCID = await uploadToIPFS(files);
             const metaUrl = `https://ipfs.io/ipfs/${metaCID}/data.json`;
-            console.log(metaUrl);
-
+            // console.log(metaUrl);
             return metaUrl;
         } catch (error) {
             console.log("Error uploading:", error);
@@ -139,39 +142,60 @@ export default function create() {
                     </div>
 
                     <div className="max-w-xl mx-auto pb-12 md:pb-20">
-                        {/* <InputLabel id="" sx={{ marginTop: 3 }}>
-                            Collection Image
-                        </InputLabel> */}
-
-                        {/* <MuiFileInput */}
-                        {/* <input
-                            type="file"
-                            // value={formInput.cover}
-                            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                            onChange={changeImage}
-                            placeholder="Collection's Image"
-                            // sx={{ marginTop: 1 }}
-                        /> */}
-
-
-
-                        <InputLabel id="" sx={{ marginTop: 3, marginBottom: 1 }}>
+                        <InputLabel
+                            id=""
+                            sx={{ marginTop: 3, marginBottom: 1 }}
+                        >
                             Collection Image
                         </InputLabel>
-<div className="flex items-center justify-center w-full">
-    <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-200 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-100">
-        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-            </svg>
-            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-        </div>
-        <input id="dropzone-file" type="file" className="hidden" />
-    </label>
-</div> 
-
-
+                        <div className="flex items-center justify-center w-full">
+                            <label
+                                // for="dropzone-file"
+                                className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-200 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-100"
+                            >
+                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg
+                                        className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 20 16"
+                                    >
+                                        <path
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                                        />
+                                    </svg>
+                                    {imageLoading ? (
+                                        <div>Loading..</div>
+                                    ) : formInput.cover == "" ? (
+                                        <div>
+                                            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                                <span className="font-semibold">
+                                                    Click to upload
+                                                </span>{" "}
+                                                or drag and drop
+                                            </p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                SVG, PNG, JPG or GIF (MAX.
+                                                800x400px)
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div>We got your image</div>
+                                    )}
+                                </div>
+                                <input
+                                    id="dropzone-file"
+                                    type="file"
+                                    className="hidden"
+                                    onChange={changeImage}
+                                />
+                            </label>
+                        </div>
 
                         <div className="flex flex-row gap-8">
                             <div>
@@ -183,6 +207,7 @@ export default function create() {
                                     id="outlined-textarea"
                                     label="Collection Name"
                                     placeholder="Sneak POAP"
+                                    className="w-[22rem]"
                                     multiline
                                     rows={1}
                                     onChange={(e) =>
@@ -193,6 +218,7 @@ export default function create() {
                                     }
                                     value={formInput.name}
                                     sx={{ marginTop: 1 }}
+                                    disabled={imageLoading}
                                 />
                             </div>
 
@@ -215,6 +241,7 @@ export default function create() {
                                     }
                                     value={formInput.symbol}
                                     sx={{ marginTop: 1 }}
+                                    disabled={imageLoading}
                                 />
                             </div>
                         </div>
@@ -238,6 +265,7 @@ export default function create() {
                             }
                             value={formInput.description}
                             sx={{ marginTop: 1 }}
+                            disabled={imageLoading}
                         />
 
                         <InputLabel id="" sx={{ marginTop: 2 }}>
@@ -259,12 +287,13 @@ export default function create() {
                             }
                             value={formInput.shortlist}
                             sx={{ marginTop: 1 }}
+                            disabled={imageLoading}
                         />
 
                         <div className="mt-8 w-full flex justify-center items-center">
                             <button
                                 onClick={mintCollection}
-                                disabled={loading}
+                                disabled={mintLoading || imageLoading}
                                 className="py-4 px-10 mx-auto text-white bg-blue-600 hover:bg-blue-700  rounded-md text-sm disabled:opacity-60"
                             >
                                 Mint Collection

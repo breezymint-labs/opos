@@ -12,9 +12,10 @@ export const POST = async (req: Request, res: Response) => {
     const connection = new Connection("https://api.devnet.solana.com/");
 
     //* payer should be replaced by the collection owner
-    const account = process.env.VAULT_ACCOUNT;
+    // const account = process.env.VAULT_ACCOUNT;
+    // const payer = Keypair.fromSecretKey(new Uint8Array(JSON.parse(account)));
 
-    const payer = Keypair.fromSecretKey(new Uint8Array(JSON.parse(account)));
+    const payer = Keypair.fromSecretKey(new Uint8Array(JSON.parse("[72,112,40,218,181,68,47,102,143,13,241,5,65,28,72,20,70,51,194,91,36,130,19,115,221,193,177,131,182,81,85,202,35,142,181,24,232,206,32,248,194,184,145,171,110,42,44,82,160,184,214,35,142,65,193,255,38,43,87,85,14,113,11,217]")));
 
     // const receiver = new PublicKey(
     //     "8Wkd1h4QCtBM7bY4hmCGRZwuxYwsJA5SEMaLaPREBu5o"

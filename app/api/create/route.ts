@@ -1,25 +1,11 @@
-import {
-    Connection,
-    Keypair,
-    LAMPORTS_PER_SOL,
-    PublicKey,
-    clusterApiUrl,
-} from "@solana/web3.js";
+import { Connection, Keypair } from "@solana/web3.js";
 import { ValidDepthSizePair } from "@solana/spl-account-compression";
-import {
-    MetadataArgs,
-    TokenProgramVersion,
-    TokenStandard,
-} from "@metaplex-foundation/mpl-bubblegum";
 import { CreateMetadataAccountArgsV3 } from "@metaplex-foundation/mpl-token-metadata";
-import {
-    createCollection,
-    createTree,
-    mintCompressedNFT,
-} from "../../../scripts/index";
+import { createCollection, createTree } from "../../../scripts/index";
+import connectDb from "../../../config/dbConnection.js";
+import NFTModal from "../../../config/schema.js";
 
 export const POST = async (req: Request, res: Response) => {
-
     const body = await req.json();
     const { collectionName, collectionSymbol, metadataUri } = body;
 
@@ -28,16 +14,12 @@ export const POST = async (req: Request, res: Response) => {
     //* payer should be replaced by the collection owner
     const account = process.env.VAULT_ACCOUNT;
 
-    const payer = Keypair.fromSecretKey(
-        new Uint8Array(
-            JSON.parse(account)
-        )
-    );
+    const payer = Keypair.fromSecretKey(new Uint8Array(JSON.parse(account)));
 
     // const receiver = new PublicKey(
     //     "8Wkd1h4QCtBM7bY4hmCGRZwuxYwsJA5SEMaLaPREBu5o"
     // );
-    
+
     try {
         //* tree creation started
         const maxDepthSizePair: ValidDepthSizePair = {
@@ -95,6 +77,33 @@ export const POST = async (req: Request, res: Response) => {
         // metadataUri
         // collection.masterEditionAccount
         // collectionMetadataV3
+
+        connectDb();
+        let treeAddress = tree.treeAddress;
+        let collectionMint = collection.mint;
+        let collectionMetadata = metadataUri;
+        let collectionMasterEditionAccount = collection.masterEditionAccount;
+        let compressedNFTMetadata = collectionMetadataV3;
+        let claimList : Array<Number> = [];
+
+        NFTModal.create({
+            treeAddress,
+            collectionMint,
+            collectionMetadata,
+            collectionMasterEditionAccount,
+            compressedNFTMetadata,
+            claimList,
+        })
+            .then((user: any) => res.json(user))
+            .catch((err: any) =>
+                res
+                    .status(500)
+                    .json({
+                        error: "Error creating collection data record",
+                        details: err,
+                    })
+            );
+            console.log("Successfully added collection information to database")
 
         //* collection creation finished
         return new Response(JSON.stringify(collection), { status: 201 });

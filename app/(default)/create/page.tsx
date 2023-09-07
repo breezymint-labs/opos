@@ -6,19 +6,18 @@ import { MuiFileInput } from "mui-file-input";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Web3Storage } from "web3.storage";
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 const web3 = require("@solana/web3.js");
 
 // form uri -----------------------------------------------------------done
-// funds transfer to vault account ------------------------------------done 
-// call create database
+// funds transfer to vault account ------------------------------------done
+// call create database -----------------------------------------------done
 // call fetch database
 // hardcode connection and payer
 // comparison check
 // call mintCompressedNFT() function with parameters
 
 export default function create() {
-    
     const [formInput, setFormInput] = React.useState({
         name: "",
         description: "",
@@ -27,43 +26,42 @@ export default function create() {
         cover: "",
     });
 
-    const { publicKey, sendTransaction } = useWallet()
-    const connection = new web3.Connection(web3.clusterApiUrl('devnet'))
+    const { publicKey, sendTransaction } = useWallet();
+    const connection = new web3.Connection(web3.clusterApiUrl("devnet"));
 
     const [loading, setLoading] = React.useState(false);
 
-    async function changeImage (e: any) {
-        const inputFile = e.target.files[0]
-        const inputFileName = e.target.files[0].name
-        const files = [new File([inputFile], inputFileName)]
-        const metaCID = await uploadToIPFS(files)
-        const url = `https://ipfs.io/ipfs/${metaCID}/${inputFileName}`
-        console.log(url)
+    async function changeImage(e: any) {
+        const inputFile = e.target.files[0];
+        const inputFileName = e.target.files[0].name;
+        const files = [new File([inputFile], inputFileName)];
+        const metaCID = await uploadToIPFS(files);
+        const url = `https://ipfs.io/ipfs/${metaCID}/${inputFileName}`;
+        console.log(url);
         setFormInput({ ...formInput, cover: url });
-    };
+    }
 
     async function mintCollection(e: any) {
         e.preventDefault();
-        setLoading(true)
+        setLoading(true);
         const metadataUri = await createURI();
         // let amount = await calculateCost()
-        let amount = 0.1
-        sendSol(amount)
+        let amount = 0.001;
+        sendSol(amount);
 
         const data = {
             collectionName: formInput.name,
             collectionSymbol: formInput.symbol,
-            metadataUri: metadataUri
+            metadataUri: metadataUri,
         };
 
         try {
             const response = await axios.post("/api/create/", data);
-            setLoading(false)
+            setLoading(false);
             if (response.status === 201) {
                 // react toastify popup "Successful Collection Mint"
-                console.log("Successful Collection Mint")
-            }
-            else {
+                console.log("Successful Collection Mint");
+            } else {
                 // react toastify popup "Minting Failed"
             }
         } catch (error: any) {
@@ -77,30 +75,26 @@ export default function create() {
     }
 
     function sendSol(amount: number) {
-        const transaction = new web3.Transaction()
+        const transaction = new web3.Transaction();
         // vault account public key
-        const recipientPubKey = `3PoUsfrtuzwrLP8AhvA7PEvEy9wJcbWGYKaj8k5uekXz`
+        const recipientPubKey = `3PoUsfrtuzwrLP8AhvA7PEvEy9wJcbWGYKaj8k5uekXz`;
 
         const sendSolInstruction = web3.SystemProgram.transfer({
             fromPubkey: publicKey,
             toPubkey: recipientPubKey,
-            lamports: web3.LAMPORTS_PER_SOL * amount
-        })
+            lamports: web3.LAMPORTS_PER_SOL * amount,
+        });
 
-        transaction.add(sendSolInstruction)
+        transaction.add(sendSolInstruction);
 
-        sendTransaction(transaction, connection).then(sig => {console.log(sig)})
+        sendTransaction(transaction, connection).then((sig) => {
+            console.log(sig);
+        });
     }
 
     async function createURI() {
         const { name, description, symbol, cover } = formInput;
-        if (
-            !name ||
-            !description ||
-            !symbol ||
-            !cover
-        )
-            return;
+        if (!name || !description || !symbol || !cover) return;
         const data = JSON.stringify({ name, description, symbol, cover });
         const files = [new File([data], "data.json")];
         try {
@@ -145,7 +139,20 @@ export default function create() {
                     </div>
 
                     <div className="max-w-xl mx-auto pb-12 md:pb-20">
-                        <InputLabel id="" sx={{ marginTop: 0 }}>
+                        <InputLabel id="" sx={{ marginTop: 3 }}>
+                            Collection Image
+                        </InputLabel>
+
+                        {/* <MuiFileInput */}
+                        <input
+                            type="file"
+                            // value={formInput.cover}
+                            onChange={changeImage}
+                            placeholder="Collection's Image"
+                            // sx={{ marginTop: 1 }}
+                        />
+
+                        <InputLabel id="" sx={{ marginTop: 2 }}>
                             Name
                         </InputLabel>
 
@@ -165,7 +172,7 @@ export default function create() {
                             sx={{ marginTop: 1 }}
                         />
 
-                        <InputLabel id="" sx={{ marginTop: 1 }}>
+                        <InputLabel id="" sx={{ marginTop: 2 }}>
                             Symbol
                         </InputLabel>
 
@@ -185,20 +192,7 @@ export default function create() {
                             sx={{ marginTop: 1 }}
                         />
 
-                        <InputLabel id="" sx={{ marginTop: 3 }}>
-                            Select Image
-                        </InputLabel>
-
-                        {/* <MuiFileInput */}
-                        <input
-                        type="file"
-                            // value={formInput.cover}
-                            onChange={changeImage}
-                            placeholder="Collection's Image"
-                            // sx={{ marginTop: 1 }}
-                        />
-
-                        <InputLabel id="" sx={{ marginTop: 3 }}>
+                        <InputLabel id="" sx={{ marginTop: 2 }}>
                             Enter some description
                         </InputLabel>
 
@@ -219,7 +213,7 @@ export default function create() {
                             sx={{ marginTop: 1 }}
                         />
 
-                        <InputLabel id="" sx={{ marginTop: 3 }}>
+                        <InputLabel id="" sx={{ marginTop: 2 }}>
                             Enter shortlist
                         </InputLabel>
 

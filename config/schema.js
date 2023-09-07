@@ -1,16 +1,31 @@
 import mongoose from "mongoose"
 
 const NFTmappingSchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: [true, "Please provide name"]
+    id: {
+        type: Number,
+        required: [true, "Please provide id"]
     },
-    email: {
+    treeAddress: {
         type: String,
-        required: [true, "Please provide email"],
-        unique: true 
+        required: [true, "Please provide treeAddress"]
     },
-    NFT: [{ tokenId: String, date: Date, claimed: Boolean }],
+    collectionMint: {
+        type: String,
+        required: [true, "Please provide collectionMint"]
+    },
+    collectionMetadata: {
+        type: String,
+        required: [true, "Please provide collectionMetadata"]
+    },
+    collectionMasterEditionAccount: {
+        type: String,
+        required: [true, "Please provide collectionMasterEditionAccount"]
+    },
+    compressedNFTMetadata: {
+        type: String,
+        required: [true, "Please provide compressedNFTMetadata"]
+    },
+    Shortlist: [{name: String}],
 })
 
-export default mongoose.model("NFTs", NFTmappingSchema)
+export default mongoose.model("NFTCollection", NFTmappingSchema)

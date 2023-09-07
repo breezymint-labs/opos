@@ -8,6 +8,8 @@ import axios from "axios";
 import { Web3Storage } from "web3.storage";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import * as web3 from "@solana/web3.js";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // form uri -----------------------------------------------------------done
 // funds transfer to vault account ------------------------------------done
@@ -26,11 +28,35 @@ export default function create() {
         cover: "",
     });
 
+    const [imageLoading, setImageLoading] = React.useState(false);
+    const [mintLoading, setMintLoading] = React.useState(false);
+
     const { publicKey, sendTransaction } = useWallet();
     const connection = new web3.Connection(web3.clusterApiUrl("devnet"));
 
-    const [imageLoading, setImageLoading] = React.useState(false);
-    const [mintLoading, setMintLoading] = React.useState(false);
+    const successMint = () =>
+        toast.success("Successful Collection Mint!", {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
+
+    const errorMint = () =>
+        toast.error("Minting Failed!", {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
 
     async function changeImage(e: any) {
         setImageLoading(true);
@@ -63,10 +89,10 @@ export default function create() {
             const response = await axios.post("/api/create/", data);
             setMintLoading(false);
             if (response.status === 201) {
-                // react toastify popup "Successful Collection Mint"
+                successMint
                 console.log("Successful Collection Mint");
-            } else {
-                // react toastify popup "Minting Failed"
+            } else if (response.status === 500){
+                errorMint
             }
         } catch (error: any) {
             console.error(error.response.data);
@@ -130,18 +156,46 @@ export default function create() {
 
     return (
         <section className="relative">
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
             <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="py-12 md:py-20">
                     {/* Section header */}
                     <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
                         <h2 className="h2 mb-4">Create Collection</h2>
                         <p className="text-xl text-gray-600">
-                            Fill all the details below and launch your POAP
+                            Fill all the details below and launch your POAPs
                             collection now!
                         </p>
                     </div>
 
                     <div className="max-w-xl mx-auto pb-12 md:pb-20">
+                        {/* <div>
+                            <button onClick={successMint}>Success!</button>
+                            <button onClick={errorMint}>Error!</button>
+                        </div> */}
                         <InputLabel
                             id=""
                             sx={{ marginTop: 3, marginBottom: 1 }}
@@ -296,7 +350,11 @@ export default function create() {
                                 disabled={mintLoading || imageLoading}
                                 className="py-4 px-10 mx-auto text-white bg-blue-600 hover:bg-blue-700  rounded-md text-sm disabled:opacity-60"
                             >
-                                Mint Collection
+                                {mintLoading ? (
+                                    <div>Cooking..</div>
+                                ) : (
+                                    <div>Mint Collection</div>
+                                )}
                             </button>
                         </div>
                     </div>

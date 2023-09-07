@@ -50,6 +50,7 @@ export async function createCollection(
     console.log("Creating a token account...");
 
     const keypairTA = Keypair.generate()
+
     const tokenAccount = await createAccount(
         connection,
         payer,
@@ -72,9 +73,9 @@ export async function createCollection(
         // mint exactly 1 token
         1,
         // no `multiSigners`
-        [],
-        undefined,
-        TOKEN_PROGRAM_ID
+        // [],
+        // undefined,
+        // TOKEN_PROGRAM_ID
     );
     console.log(explorerURL({ txSignature: mintSig }));
 

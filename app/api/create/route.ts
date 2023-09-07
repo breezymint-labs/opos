@@ -88,6 +88,7 @@ export const POST = async (req: Request, res: Response) => {
         let claimList : Array<Number> = [];
 
         NFTModal.create({
+            collectionName,
             treeAddress,
             collectionMint,
             collectionMetadata,
